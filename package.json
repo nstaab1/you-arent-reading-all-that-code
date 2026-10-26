@@ -1,0 +1,8 @@
+{
+  "name": "you-arent-reading-all-that-code",
+  "private": true,
+  "scripts": {
+    "skills:install": "npx --yes skills@latest add nstaab1/nathan-agent-skills --skill '*' --agent claude-code codex -y",
+    "skills:update": "npx --yes skills@latest update --project --yes"
+  }
+}
