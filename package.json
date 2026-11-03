@@ -10,6 +10,7 @@
   ],
   "scripts": {
     "dev": "npm run start -w @bestiary/feed & npm run dev -w @bestiary/web",
+    "bot": "npm run start -w @bestiary/bot",
     "band1": "tsx scripts/net/cli.ts band1",
     "band2": "tsx scripts/net/cli.ts band2",
     "verify": "tsx scripts/net/cli.ts verify",

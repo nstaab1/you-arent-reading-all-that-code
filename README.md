@@ -13,15 +13,23 @@ npm run dev
 
 The feed serves creatures on port 4000. The Bestiary opens at http://localhost:5173.
 
+The Creature of the Day bot reads the same feed and prints the post it would make. It never posts anywhere. With the feed running:
+
+```bash
+npm run bot
+```
+
 ## The net
 
 Each band is one command. A band runs every layer even after one fails, then prints a scoreboard and exits non-zero if any layer failed. Each run writes `.net/results/<command>.json`.
 
-| Command          | Layers                                       |
-| ---------------- | -------------------------------------------- |
-| `npm run band1`  | Formatting, linting, type checking           |
-| `npm run band2`  | Unit and integration tests, with V8 coverage |
-| `npm run verify` | Both bands. This is the net                  |
+| Command          | Layers                               |
+| ---------------- | ------------------------------------ |
+| `npm run band1`  | Formatting, linting, type checking   |
+| `npm run band2`  | Unit, integration and contract tests |
+| `npm run verify` | Both bands. This is the net          |
+
+Unit and integration tests report V8 coverage. The contract layer runs Pact. The bot's consumer test writes the pact file in `pacts/`, and the feed's provider test replays it against the feed server. Both talk only to loopback, and there is no broker.
 
 A pre-commit hook formats and lints staged files. The `net` job in GitHub Actions runs `verify` on every pull request and on pushes to `main`, and `main` requires it.
 

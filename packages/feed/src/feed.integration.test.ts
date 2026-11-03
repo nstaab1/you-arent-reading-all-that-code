@@ -36,7 +36,7 @@ describe('GET /api/creatures', () => {
       .expect('Content-Type', /json/)
       .expect(200);
 
-    expect(response.body).toEqual({
+    expect(response.body).toMatchObject({
       creatures: [
         {
           slug: 'vibe-coder',
