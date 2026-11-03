@@ -1,0 +1,64 @@
+:root {
+  --ink: #2b1d14;
+  --parchment: #f6eedb;
+  --card: #fdf8ec;
+  --rule: #7a1f1f;
+  font-family: Georgia, 'Times New Roman', serif;
+  color: var(--ink);
+  background: var(--parchment);
+}
+
+body {
+  margin: 0;
+}
+
+.bestiary {
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.talk-cards {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.talk-card {
+  background: var(--card);
+  border-top: 4px solid var(--rule);
+  border-bottom: 4px solid var(--rule);
+  padding: 1rem 1.25rem;
+}
+
+.talk-card h2 {
+  margin: 0;
+  color: var(--rule);
+  font-variant: small-caps;
+}
+
+.talk-title {
+  margin: 0.25rem 0 1rem;
+  font-style: italic;
+}
+
+.stat-block {
+  margin: 0;
+  border-top: 2px solid var(--rule);
+  padding-top: 0.75rem;
+}
+
+.stat-block div {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.stat-block dt {
+  font-weight: bold;
+  color: var(--rule);
+}
+
+.stat-block dd {
+  margin: 0;
+}

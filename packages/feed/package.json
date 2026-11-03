@@ -1,0 +1,17 @@
+{
+  "name": "@bestiary/feed",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/server.ts"
+  },
+  "devDependencies": {
+    "@types/express": "5.0.6",
+    "@types/supertest": "7.2.1",
+    "supertest": "7.3.1"
+  },
+  "dependencies": {
+    "express": "5.3.0",
+    "yaml": "2.9.1"
+  }
+}
