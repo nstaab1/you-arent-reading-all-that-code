@@ -12,6 +12,10 @@ export interface Layer {
   steps: string[][];
   /** Picks the one-line failure summary from the tool's output. The last matching line wins. */
   summary: RegExp;
+  /** Environment variables removed before the layer's tools start. */
+  unsetEnv?: string[];
+  /** Ends a step's output at the first line matching this. The rest is neither shown nor summarized. */
+  cutAfter?: RegExp;
 }
 
 export interface LayerResult {
@@ -33,6 +37,7 @@ export interface RunResult {
 const GREEN = '\u001b[32m';
 const RED = '\u001b[31m';
 const BOLD = '\u001b[1m';
+const DIM = '\u001b[2m';
 const RESET = '\u001b[0m';
 
 export async function runLayers(
@@ -73,7 +78,7 @@ async function runLayer(layer: Layer, output: Writable): Promise<LayerResult> {
 
   for (const [program, ...args] of layer.steps) {
     if (!program) continue;
-    const exitCode = await runStep(program, args, output, (text) => (transcript += text));
+    const exitCode = await runStep(program, args, layer, output, (text) => (transcript += text));
     if (exitCode !== 0 && failedExitCode === null) failedExitCode = exitCode;
   }
 
@@ -93,25 +98,47 @@ async function runLayer(layer: Layer, output: Writable): Promise<LayerResult> {
 function runStep(
   program: string,
   args: string[],
+  layer: Pick<Layer, 'unsetEnv' | 'cutAfter'>,
   output: Writable,
   record: (text: string) => void,
 ): Promise<number> {
   return new Promise((resolve) => {
-    const child = spawn(program, args, {
-      stdio: ['ignore', 'pipe', 'pipe'],
-      env: { ...process.env, FORCE_COLOR: process.env.FORCE_COLOR ?? '1' },
-    });
-    const forward = (chunk: Buffer) => {
-      output.write(chunk);
-      record(chunk.toString());
+    const env: NodeJS.ProcessEnv = { ...process.env, FORCE_COLOR: process.env.FORCE_COLOR ?? '1' };
+    for (const name of layer.unsetEnv ?? []) delete env[name];
+    const child = spawn(program, args, { stdio: ['ignore', 'pipe', 'pipe'], env });
+
+    let cut = false;
+    const show = (text: string) => {
+      output.write(text);
+      record(text);
     };
-    child.stdout.on('data', forward);
-    child.stderr.on('data', forward);
+    const showLine = (line: string) => {
+      if (cut) return;
+      show(line);
+      if (layer.cutAfter?.test(stripVTControlCharacters(line))) {
+        cut = true;
+        output.write(`${DIM}[the net cut the rest of this output]${RESET}\n`);
+      }
+    };
+    const streams = [child.stdout, child.stderr].map((stream) => {
+      const unfinished = { line: '' };
+      stream.on('data', (chunk: Buffer) => {
+        if (!layer.cutAfter) return show(chunk.toString());
+        const parts = (unfinished.line + chunk.toString()).split(/(?<=\n)/);
+        unfinished.line = parts.at(-1)?.endsWith('\n') ? '' : (parts.pop() ?? '');
+        parts.forEach(showLine);
+      });
+      return unfinished;
+    });
+
     child.on('error', (error) => {
-      forward(Buffer.from(`${error.message}\n`));
+      show(`${error.message}\n`);
       resolve(127);
     });
-    child.on('close', (code) => resolve(code ?? 1));
+    child.on('close', (code) => {
+      for (const unfinished of streams) if (unfinished.line) showLine(unfinished.line);
+      resolve(code ?? 1);
+    });
   });
 }
 

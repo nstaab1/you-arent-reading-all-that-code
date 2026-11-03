@@ -107,6 +107,47 @@ describe('runLayers', () => {
     });
   });
 
+  it("unsets the layer's named environment variables for its tools", async () => {
+    process.env.HTTPS_PROXY = 'http://proxy.invalid:3128';
+    try {
+      const layer: Layer = {
+        ...nodeLayer(2, 'Contract', 'console.log(`proxy: ${process.env.HTTPS_PROXY ?? "none"}`)'),
+        unsetEnv: ['HTTPS_PROXY'],
+      };
+
+      await runLayers('band2', [layer], { resultsFile, output });
+    } finally {
+      delete process.env.HTTPS_PROXY;
+    }
+
+    expect(printed).toContain('proxy: none');
+  });
+
+  it("cuts a tool's output after the line that ends its readable failure", async () => {
+    const layer: Layer = {
+      ...nodeLayer(
+        2,
+        'Contract',
+        'console.log("$ -> Actual map is missing the following keys: totalCents"); console.log("There were 1 pact failures"); console.log(`Error: {"errors":[${"x".repeat(1000)}]}`); console.log("Tests  1 failed (1)"); process.exit(1)',
+        / -> |Tests\s+.*failed/,
+      ),
+      cutAfter: /There were \d+ pact failures/,
+    };
+
+    await runLayers('band2', [layer], { resultsFile, output });
+
+    expect(printed).toContain('There were 1 pact failures');
+    expect(printed).not.toContain('Error: {"errors"');
+    expect(await readResults()).toMatchObject({
+      layers: [
+        {
+          status: 'failed',
+          summary: '$ -> Actual map is missing the following keys: totalCents',
+        },
+      ],
+    });
+  });
+
   it('falls back to the exit code when no output line matches the summary', async () => {
     await runLayers('band1', [nodeLayer(2, 'Unit', 'process.exit(3)', /never matches/)], {
       resultsFile,

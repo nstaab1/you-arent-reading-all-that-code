@@ -1,0 +1,14 @@
+{
+  "name": "@bestiary/bot",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/cli.ts"
+  },
+  "dependencies": {
+    "@bestiary/stats": "*"
+  },
+  "devDependencies": {
+    "@pact-foundation/pact": "17.1.4"
+  }
+}

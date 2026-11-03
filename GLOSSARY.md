@@ -8,6 +8,10 @@ The Bestiary lists the talks of an invented conference as creatures of AI hype, 
 A talk at the conference, written up as a monster of AI hype. Each creature is one committed Markdown file.
 _Avoid_: monster, entry
 
+**Creature of the Day**:
+The one creature the bot picks for a given day. The bot prints the post it would make about it. The post quotes the Challenge Rating the feed gives the creature. Nothing posts anywhere.
+_Avoid_: featured creature, daily pick
+
 **Talk card**:
 A creature's place in the Bestiary list: its name, its talk's title and its stat block.
 _Avoid_: tile, row

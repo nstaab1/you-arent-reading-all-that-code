@@ -5,6 +5,9 @@ import type { Layer } from './run-layers';
 export type NetCommand = 'band1' | 'band2' | 'verify';
 
 const VITEST_FAILURE = /^(Tests\s+.*failed|ERROR: Coverage)/;
+const CONTRACT_FAILURE = /^\$\S* -> |^Tests\s+.*failed/;
+// Pact fails provider verification behind an unreachable proxy, even on loopback.
+const PROXY_VARIABLES = ['HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy'];
 
 export function netCommands(root: string): Record<NetCommand, Layer[]> {
   const bin = (tool: string) => join(root, 'node_modules', '.bin', tool);
@@ -16,11 +19,9 @@ export function netCommands(root: string): Record<NetCommand, Layer[]> {
       .filter((project) => existsSync(join(root, project, 'tsconfig.json'))),
   ];
 
-  const vitestProject = (project: string): string[] => [
-    bin('vitest'),
-    'run',
-    '--project',
-    project,
+  const vitestRun = (project: string): string[] => [bin('vitest'), 'run', '--project', project];
+  const vitestWithCoverage = (project: string): string[] => [
+    ...vitestRun(project),
     '--coverage',
     `--coverage.reportsDirectory=coverage/${project}`,
   ];
@@ -56,14 +57,24 @@ export function netCommands(root: string): Record<NetCommand, Layer[]> {
     {
       band: 2,
       name: 'Unit',
-      steps: [vitestProject('unit')],
+      steps: [vitestWithCoverage('unit')],
       summary: VITEST_FAILURE,
     },
     {
       band: 2,
       name: 'Integration',
-      steps: [vitestProject('integration')],
+      steps: [vitestWithCoverage('integration')],
       summary: VITEST_FAILURE,
+    },
+    {
+      band: 2,
+      name: 'Contract',
+      // The consumer tests write the pact file, then the provider verification replays it.
+      steps: [vitestRun('contract-consumer'), vitestRun('contract-provider')],
+      summary: CONTRACT_FAILURE,
+      unsetEnv: PROXY_VARIABLES,
+      // After this line Pact throws its whole result as one long JSON line.
+      cutAfter: /There were \d+ pact failures?/,
     },
   ];
 
