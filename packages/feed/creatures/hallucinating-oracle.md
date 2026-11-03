@@ -1,6 +1,6 @@
 ---
 name: The Hallucinating Oracle
-talk: Ask Me Anything, I'll Answer Anyway
+talkTitle: Ask Me Anything, I'll Answer Anyway
 buzzwords:
   - agentic
   - RAG

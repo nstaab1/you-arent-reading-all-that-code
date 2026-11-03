@@ -7,7 +7,7 @@ import { createFeedApp } from './app';
 
 const creatureFile = `---
 name: The Vibe Coder
-talk: Shipping on Feelings Alone
+talkTitle: Shipping on Feelings Alone
 buzzwords:
   - vibe coding
   - agentic
@@ -41,7 +41,7 @@ describe('GET /api/creatures', () => {
         {
           slug: 'vibe-coder',
           name: 'The Vibe Coder',
-          talk: 'Shipping on Feelings Alone',
+          talkTitle: 'Shipping on Feelings Alone',
           buzzwords: ['vibe coding', 'agentic'],
           lore: 'It writes a thousand lines an hour.\n\nIt reads none of them.\n',
         },

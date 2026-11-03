@@ -3,6 +3,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import type { Writable } from 'node:stream';
 import { stripVTControlCharacters } from 'node:util';
+import type { NetCommand } from './bands';
 
 export interface Layer {
   band: number;
@@ -22,7 +23,7 @@ export interface LayerResult {
 }
 
 export interface RunResult {
-  command: string;
+  command: NetCommand;
   commit: string | null;
   startedAt: string;
   passed: boolean;
@@ -35,7 +36,7 @@ const BOLD = '\u001b[1m';
 const RESET = '\u001b[0m';
 
 export async function runLayers(
-  command: string,
+  command: NetCommand,
   layers: Layer[],
   options: { resultsFile: string; output: Writable; commit?: string | null },
 ): Promise<RunResult> {
@@ -46,8 +47,9 @@ export async function runLayers(
   for (const layer of layers) {
     output.write(`\n${BOLD}━━ Band ${layer.band} · ${layer.name} ━━${RESET}\n`);
     const result = await runLayer(layer, output);
-    const mark = result.status === 'passed' ? `${GREEN}✔` : `${RED}✘`;
-    output.write(`${mark} ${layer.name} ${result.status} in ${result.seconds}s${RESET}\n`);
+    output.write(
+      `${statusMark(result.status)} ${layer.name} ${result.status} in ${result.seconds}s${RESET}\n`,
+    );
     results.push(result);
   }
 
@@ -113,6 +115,10 @@ function runStep(
   });
 }
 
+function statusMark(status: LayerResult['status']): string {
+  return status === 'passed' ? `${GREEN}✔` : `${RED}✘`;
+}
+
 function summarize(transcript: string, pattern: RegExp): string | null {
   const lines = stripVTControlCharacters(transcript)
     .split('\n')
@@ -128,12 +134,13 @@ function printScoreboard(run: RunResult, options: { resultsFile: string; output:
   output.write(
     `\n${BOLD}${colour}${run.command}: ${passedCount} of ${run.layers.length} layers passed${RESET}\n`,
   );
-  const width = Math.max(...run.layers.map((layer) => layer.layer.length));
-  for (const layer of run.layers) {
-    const mark = layer.status === 'passed' ? `${GREEN}✔` : `${RED}✘`;
-    const time = `${layer.seconds.toFixed(1)}s`.padStart(6);
-    const summary = layer.summary ? `  ${layer.summary}` : '';
-    output.write(`  ${mark} ${layer.layer.padEnd(width)}${RESET} ${time}${summary}\n`);
+  const width = Math.max(...run.layers.map((result) => result.layer.length));
+  for (const result of run.layers) {
+    const time = `${result.seconds.toFixed(1)}s`.padStart(6);
+    const summary = result.summary ? `  ${result.summary}` : '';
+    output.write(
+      `  ${statusMark(result.status)} ${result.layer.padEnd(width)}${RESET} ${time}${summary}\n`,
+    );
   }
   output.write(`Results: ${options.resultsFile}\n`);
 }

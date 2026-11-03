@@ -4,6 +4,8 @@ import type { Layer } from './run-layers';
 
 export type NetCommand = 'band1' | 'band2' | 'verify';
 
+const VITEST_FAILURE = /^(Tests\s+.*failed|ERROR: Coverage)/;
+
 export function netCommands(root: string): Record<NetCommand, Layer[]> {
   const bin = (tool: string) => join(root, 'node_modules', '.bin', tool);
 
@@ -55,13 +57,13 @@ export function netCommands(root: string): Record<NetCommand, Layer[]> {
       band: 2,
       name: 'Unit',
       steps: [vitestProject('unit')],
-      summary: /^(Tests\s+.*failed|ERROR: Coverage)/,
+      summary: VITEST_FAILURE,
     },
     {
       band: 2,
       name: 'Integration',
       steps: [vitestProject('integration')],
-      summary: /^(Tests\s+.*failed|ERROR: Coverage)/,
+      summary: VITEST_FAILURE,
     },
   ];
 

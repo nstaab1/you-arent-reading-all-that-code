@@ -5,7 +5,7 @@ import { parse } from 'yaml';
 export interface CreatureRecord {
   slug: string;
   name: string;
-  talk: string;
+  talkTitle: string;
   buzzwords: string[];
   lore: string;
 }
@@ -26,12 +26,12 @@ function parseCreatureFile(file: string, text: string): CreatureRecord {
   if (!match) throw new Error(`${file}: no frontmatter`);
   const frontmatter: unknown = parse(match[1] ?? '');
   if (!isFrontmatter(frontmatter)) {
-    throw new Error(`${file}: frontmatter needs name, talk and a buzzwords list`);
+    throw new Error(`${file}: frontmatter needs name, talkTitle and a buzzwords list`);
   }
   return {
     slug: basename(file, '.md'),
     name: frontmatter.name,
-    talk: frontmatter.talk,
+    talkTitle: frontmatter.talkTitle,
     buzzwords: frontmatter.buzzwords,
     lore: text.slice(match[0].length).replace(/^\n+/, ''),
   };
@@ -39,10 +39,10 @@ function parseCreatureFile(file: string, text: string): CreatureRecord {
 
 function isFrontmatter(value: unknown): value is Omit<CreatureRecord, 'slug' | 'lore'> {
   if (typeof value !== 'object' || value === null) return false;
-  const { name, talk, buzzwords } = value as Record<string, unknown>;
+  const { name, talkTitle, buzzwords } = value as Record<string, unknown>;
   return (
     typeof name === 'string' &&
-    typeof talk === 'string' &&
+    typeof talkTitle === 'string' &&
     Array.isArray(buzzwords) &&
     buzzwords.every((buzzword) => typeof buzzword === 'string')
   );

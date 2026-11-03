@@ -7,7 +7,7 @@ export function TalkCard({ creature }: { creature: Creature }) {
   return (
     <article className="talk-card" aria-labelledby={`${creature.slug}-name`}>
       <h2 id={`${creature.slug}-name`}>{creature.name}</h2>
-      <p className="talk-title">{creature.talk}</p>
+      <p className="talk-title">{creature.talkTitle}</p>
       <dl className="stat-block">
         <div>
           <dt>Challenge Rating</dt>

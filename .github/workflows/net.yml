@@ -1,0 +1,32 @@
+name: Net
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  net:
+    name: net
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      # Setup steps that need the network skip under `act`, which sets ACT.
+      - name: Set up Node
+        if: ${{ !env.ACT }}
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        if: ${{ !env.ACT }}
+        run: npm ci
+
+      - name: Run the net
+        run: npm run verify

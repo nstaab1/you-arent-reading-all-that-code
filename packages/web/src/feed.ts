@@ -1,7 +1,7 @@
 export interface Creature {
   slug: string;
   name: string;
-  talk: string;
+  talkTitle: string;
   buzzwords: string[];
   lore: string;
 }
