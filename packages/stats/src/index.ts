@@ -75,3 +75,29 @@ const XP_BY_CHALLENGE_RATING: Record<ChallengeRating, number> = {
 export function experiencePoints(challengeRating: ChallengeRating): number {
   return XP_BY_CHALLENGE_RATING[challengeRating];
 }
+
+// The Bestiary's invented hype table: each row is the fewest buzzwords a
+// talk needs to reach that Challenge Rating.
+const HYPE_TABLE: readonly (readonly [
+  minimumBuzzwords: number,
+  challengeRating: ChallengeRating,
+])[] = [
+  [30, '30'],
+  [20, '20'],
+  [15, '15'],
+  [12, '11'],
+  [10, '8'],
+  [8, '5'],
+  [7, '4'],
+  [6, '3'],
+  [5, '2'],
+  [4, '1'],
+  [3, '1/2'],
+  [2, '1/4'],
+  [1, '1/8'],
+];
+
+export function hypeChallengeRating(buzzwordCount: number): ChallengeRating {
+  const row = HYPE_TABLE.find(([minimumBuzzwords]) => buzzwordCount >= minimumBuzzwords);
+  return row ? row[1] : '0';
+}

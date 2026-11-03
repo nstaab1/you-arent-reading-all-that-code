@@ -9,15 +9,26 @@
     "packages/*"
   ],
   "scripts": {
+    "dev": "npm run start -w @bestiary/feed & npm run dev -w @bestiary/web",
+    "band1": "tsx scripts/net/cli.ts band1",
+    "band2": "tsx scripts/net/cli.ts band2",
+    "verify": "tsx scripts/net/cli.ts verify",
     "skills:install": "npx --yes skills@latest add nstaab1/nathan-agent-skills --skill '*' --agent claude-code codex -y",
     "skills:update": "npx --yes skills@latest update --project --yes",
     "prepare": "husky"
   },
   "devDependencies": {
+    "@eslint/js": "10.0.1",
     "@types/node": "24.19.2",
     "@vitest/coverage-v8": "5.0.5",
+    "eslint": "10.13.0",
+    "globals": "17.13.0",
+    "husky": "9.1.7",
+    "lint-staged": "17.6.0",
+    "prettier": "3.9.10",
     "tsx": "4.23.15",
     "typescript": "6.0.3",
+    "typescript-eslint": "8.72.0",
     "vitest": "5.0.5"
   }
 }
