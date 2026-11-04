@@ -12,10 +12,32 @@ body {
   margin: 0;
 }
 
-.bestiary {
+.screens {
   max-width: 48rem;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 1rem 1rem 0;
+  display: flex;
+  gap: 1rem;
+}
+
+.screens a {
+  color: var(--rule);
+}
+
+.screens a[aria-current='page'] {
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.bestiary,
+.encounter-builder {
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: 1rem 1rem 2rem;
+}
+
+.time-slot h2 {
+  border-bottom: 2px solid var(--rule);
 }
 
 .talk-cards {
@@ -32,15 +54,20 @@ body {
   padding: 1rem 1.25rem;
 }
 
-.talk-card h2 {
+.talk-card h3,
+.encounter-talk h3 {
   margin: 0;
   color: var(--rule);
   font-variant: small-caps;
 }
 
 .talk-title {
-  margin: 0.25rem 0 1rem;
+  margin: 0.25rem 0 0;
   font-style: italic;
+}
+
+.talk-room {
+  margin: 0.25rem 0 1rem;
 }
 
 .stat-block {
@@ -61,4 +88,48 @@ body {
 
 .stat-block dd {
   margin: 0;
+}
+
+.encounter-talks {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.encounter-talk {
+  background: var(--card);
+  border-left: 4px solid var(--rule);
+  padding: 0.75rem 1rem;
+}
+
+.encounter-talk button {
+  font: inherit;
+  color: var(--parchment);
+  background: var(--rule);
+  border: none;
+  padding: 0.4rem 0.9rem;
+  cursor: pointer;
+}
+
+/* The sticky footer holds the encounter summary. While the page scrolls it
+   rides over the talks above it. It sits last in the page, so at the end of
+   the scroll it rests below the last talk. */
+.encounter-footer {
+  position: sticky;
+  bottom: 0;
+  margin-top: 2rem;
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  color: var(--parchment);
+  background: var(--ink);
+}
+
+.encounter-footer p {
+  margin: 0;
+}
+
+.encounter-xp {
+  font-weight: bold;
 }

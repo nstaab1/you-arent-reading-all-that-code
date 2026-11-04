@@ -8,6 +8,8 @@ buzzwords:
   - prompt engineering
   - AI-native
   - 10x
+timeSlot: '09:00'
+room: Great Hall
 ---
 
 The Hallucinating Oracle has never said "I don't know". It answers every question with total confidence and a citation to a paper nobody can find.

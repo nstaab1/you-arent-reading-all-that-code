@@ -12,6 +12,14 @@ _Avoid_: monster, entry
 The one creature the bot picks for a given day. The bot prints the post it would make about it. The post quotes the Challenge Rating the feed gives the creature. Nothing posts anywhere.
 _Avoid_: featured creature, daily pick
 
+**Time slot**:
+A start time in the conference's one-day schedule, written HH:MM. Every talk holds one time slot and one room, and the talks in a slot run at once in different rooms.
+_Avoid_: timeslot, period
+
+**Encounter**:
+The talks a visitor picks from the day's time slots in the encounter builder. Its XP total is the sum of its creatures' XP. It lives in the visitor's browser.
+_Avoid_: schedule, basket, cart
+
 **Talk card**:
 A creature's place in the Bestiary list: its name, its talk's title and its stat block.
 _Avoid_: tile, row

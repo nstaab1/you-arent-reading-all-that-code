@@ -7,10 +7,14 @@ export interface CreatureRecord {
   name: string;
   talkTitle: string;
   buzzwords: string[];
+  /** The talk's start time in the day's schedule, written `HH:MM` on a 24-hour clock. */
+  timeSlot: string;
+  room: string;
   lore: string;
 }
 
 const FRONTMATTER = /^---\n([\s\S]*?)\n---\n?/;
+const TIME_SLOT = /^([01]\d|2[0-3]):[0-5]\d$/;
 
 export async function readCreatures(creaturesDirectory: string): Promise<CreatureRecord[]> {
   const files = (await readdir(creaturesDirectory)).filter((file) => file.endsWith('.md')).sort();
@@ -26,24 +30,32 @@ function parseCreatureFile(file: string, text: string): CreatureRecord {
   if (!match) throw new Error(`${file}: no frontmatter`);
   const frontmatter: unknown = parse(match[1] ?? '');
   if (!isFrontmatter(frontmatter)) {
-    throw new Error(`${file}: frontmatter needs name, talkTitle and a buzzwords list`);
+    throw new Error(
+      `${file}: frontmatter needs name, talkTitle, a buzzwords list, a timeSlot written HH:MM and a room`,
+    );
   }
   return {
     slug: basename(file, '.md'),
     name: frontmatter.name,
     talkTitle: frontmatter.talkTitle,
     buzzwords: frontmatter.buzzwords,
+    timeSlot: frontmatter.timeSlot,
+    room: frontmatter.room,
     lore: text.slice(match[0].length).replace(/^\n+/, ''),
   };
 }
 
 function isFrontmatter(value: unknown): value is Omit<CreatureRecord, 'slug' | 'lore'> {
   if (typeof value !== 'object' || value === null) return false;
-  const { name, talkTitle, buzzwords } = value as Record<string, unknown>;
+  const { name, talkTitle, buzzwords, timeSlot, room } = value as Record<string, unknown>;
   return (
     typeof name === 'string' &&
     typeof talkTitle === 'string' &&
     Array.isArray(buzzwords) &&
-    buzzwords.every((buzzword) => typeof buzzword === 'string')
+    buzzwords.every((buzzword) => typeof buzzword === 'string') &&
+    typeof timeSlot === 'string' &&
+    TIME_SLOT.test(timeSlot) &&
+    typeof room === 'string' &&
+    room.trim() !== ''
   );
 }
