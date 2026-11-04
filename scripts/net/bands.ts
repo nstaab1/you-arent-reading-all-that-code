@@ -6,6 +6,8 @@ export type NetCommand = 'band1' | 'band2' | 'verify';
 
 const VITEST_FAILURE = /^(Tests\s+.*failed|ERROR: Coverage)/;
 const CONTRACT_FAILURE = /^\$\S* -> |^Tests\s+.*failed/;
+// Playwright lists each failed flow at the end of its run. A server that never starts prints an Error.
+const END_TO_END_FAILURE = /^\[chromium\] › |^Error: /;
 // Pact fails provider verification behind an unreachable proxy, even on loopback.
 const PROXY_VARIABLES = ['HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy'];
 
@@ -75,6 +77,12 @@ export function netCommands(root: string): Record<NetCommand, Layer[]> {
       unsetEnv: PROXY_VARIABLES,
       // After this line Pact throws its whole result as one long JSON line.
       cutAfter: /There were \d+ pact failures?/,
+    },
+    {
+      band: 2,
+      name: 'End-to-end',
+      steps: [[bin('playwright'), 'test']],
+      summary: END_TO_END_FAILURE,
     },
   ];
 

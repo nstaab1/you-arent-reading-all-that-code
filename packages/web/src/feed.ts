@@ -3,6 +3,9 @@ export interface Creature {
   name: string;
   talkTitle: string;
   buzzwords: string[];
+  /** The talk's start time in the day's schedule, written `HH:MM`. */
+  timeSlot: string;
+  room: string;
   lore: string;
 }
 

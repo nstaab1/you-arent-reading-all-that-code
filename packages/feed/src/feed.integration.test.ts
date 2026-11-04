@@ -11,6 +11,8 @@ talkTitle: Shipping on Feelings Alone
 buzzwords:
   - vibe coding
   - agentic
+timeSlot: '11:00'
+room: Great Hall
 ---
 
 It writes a thousand lines an hour.
@@ -43,9 +45,20 @@ describe('GET /api/creatures', () => {
           name: 'The Vibe Coder',
           talkTitle: 'Shipping on Feelings Alone',
           buzzwords: ['vibe coding', 'agentic'],
+          timeSlot: '11:00',
+          room: 'Great Hall',
           lore: 'It writes a thousand lines an hour.\n\nIt reads none of them.\n',
         },
       ],
     });
+  });
+
+  it('refuses a creature whose time slot is not written HH:MM', async () => {
+    await writeFile(
+      join(creaturesDirectory, 'vibe-coder.md'),
+      creatureFile.replace("timeSlot: '11:00'", "timeSlot: '9am'"),
+    );
+
+    await request(createFeedApp({ creaturesDirectory })).get('/api/creatures').expect(500);
   });
 });

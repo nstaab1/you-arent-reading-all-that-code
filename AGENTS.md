@@ -26,6 +26,7 @@ gh api -H "Accept: application/vnd.github.raw" "repos/nstaab1/codemash-27-talks/
 - **Off-limits ideas.** The spec's "What `main` must never hold" rule names ideas this repo never holds. Never define or use them, under any name, in data, code, `AGENTS.md` or `GLOSSARY.md`.
 - **`Intent:` trailer.** Every agent commit ends its message with an `Intent:` trailer: one line, in the agent's own words, saying what the commit is for.
 - **The net.** `npm run verify` is the net. No change may weaken it without a ticket saying so. Weakening includes deleting or skipping a test, loosening a lint or type rule, dropping a layer, and committing with `--no-verify`. Leave `verify` green locally and the CI `net` job green on the PR.
+- **Screens and flows.** Each screen owns one folder under `packages/web/src/screens/`. Each end-to-end flow in `e2e/` is tagged `@<folder>` for every screen it visits.
 - **Attended-only.** The agent PR, its branch, the rerun branch and the proof folders are attended-only. An AFK agent never creates, edits, rebases or pushes them.
 
 ## Agent skills
