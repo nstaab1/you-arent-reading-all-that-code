@@ -1,0 +1,11 @@
+rules:
+  - id: no-eval
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: >-
+      This runs a string as code. Anything that reaches the string runs with
+      the app's rights. Call a function instead.
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: new Function(...)
+      - pattern: Function(...)

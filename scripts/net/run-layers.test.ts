@@ -123,6 +123,21 @@ describe('runLayers', () => {
     expect(printed).toContain('proxy: none');
   });
 
+  it("sets the layer's environment variables for its tools", async () => {
+    const layer: Layer = {
+      ...nodeLayer(
+        3,
+        'Dependency scanning',
+        'console.log(`database: ${process.env.OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY}`)',
+      ),
+      env: { OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY: '/fixed/folder' },
+    };
+
+    await runLayers('band3', [layer], { resultsFile, output });
+
+    expect(printed).toContain('database: /fixed/folder');
+  });
+
   it("cuts a tool's output after the line that ends its readable failure", async () => {
     const layer: Layer = {
       ...nodeLayer(

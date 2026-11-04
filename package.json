@@ -13,7 +13,9 @@
     "bot": "npm run start -w @bestiary/bot",
     "band1": "tsx scripts/net/cli.ts band1",
     "band2": "tsx scripts/net/cli.ts band2",
+    "band3": "tsx scripts/net/cli.ts band3",
     "verify": "tsx scripts/net/cli.ts verify",
+    "advisories": "tsx scripts/net/advisories.ts",
     "skills:install": "npx --yes skills@latest add nstaab1/nathan-agent-skills --skill '*' --agent claude-code codex -y",
     "skills:update": "npx --yes skills@latest update --project --yes",
     "prepare": "husky"
@@ -32,5 +34,8 @@
     "typescript": "6.0.3",
     "typescript-eslint": "8.72.0",
     "vitest": "5.0.5"
+  },
+  "overrides": {
+    "minimatch": "11.0.4"
   }
 }

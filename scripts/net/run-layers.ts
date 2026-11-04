@@ -12,6 +12,8 @@ export interface Layer {
   steps: string[][];
   /** Picks the one-line failure summary from the tool's output. The last matching line wins. */
   summary: RegExp;
+  /** Environment variables set for the layer's tools. */
+  env?: Record<string, string>;
   /** Environment variables removed before the layer's tools start. */
   unsetEnv?: string[];
   /** Ends a step's output at the first line matching this. The rest is neither shown nor summarized. */
@@ -98,12 +100,16 @@ async function runLayer(layer: Layer, output: Writable): Promise<LayerResult> {
 function runStep(
   program: string,
   args: string[],
-  layer: Pick<Layer, 'unsetEnv' | 'cutAfter'>,
+  layer: Pick<Layer, 'env' | 'unsetEnv' | 'cutAfter'>,
   output: Writable,
   record: (text: string) => void,
 ): Promise<number> {
   return new Promise((resolve) => {
-    const env: NodeJS.ProcessEnv = { ...process.env, FORCE_COLOR: process.env.FORCE_COLOR ?? '1' };
+    const env: NodeJS.ProcessEnv = {
+      ...process.env,
+      FORCE_COLOR: process.env.FORCE_COLOR ?? '1',
+      ...layer.env,
+    };
     for (const name of layer.unsetEnv ?? []) delete env[name];
     const child = spawn(program, args, { stdio: ['ignore', 'pipe', 'pipe'], env });
 

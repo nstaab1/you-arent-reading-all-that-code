@@ -21,11 +21,15 @@ The talks a visitor picks from the day's time slots in the encounter builder. It
 _Avoid_: schedule, basket, cart
 
 **Talk card**:
-A creature's place in the Bestiary list: its name, its talk's title and its stat block.
+A creature's place in the Bestiary list: its name, its talk's title and its stat block. Its name links to the creature page.
 _Avoid_: tile, row
 
+**Creature page**:
+A creature's own page in the Bestiary, holding its talk, its stat block and its lore.
+_Avoid_: detail page, profile
+
 **Stat block**:
-The panel on a talk card showing a creature's Challenge Rating, XP and buzzwords.
+The panel showing a creature's Challenge Rating, XP and buzzwords, on its talk card and its creature page.
 _Avoid_: stats panel, details
 
 **Buzzword**:
@@ -45,5 +49,5 @@ The experience points a creature is worth, looked up from its Challenge Rating i
 _Avoid_: points, score
 
 **Lore**:
-The Markdown body of a creature's file, telling its story.
+The Markdown body of a creature's file, telling its story. The creature page renders it from Markdown.
 _Avoid_: description, bio
