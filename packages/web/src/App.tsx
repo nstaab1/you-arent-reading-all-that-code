@@ -1,5 +1,7 @@
 import { useSyncExternalStore } from 'react';
+import { creatureSlug } from './routes';
 import { BestiaryScreen } from './screens/bestiary/BestiaryScreen';
+import { CreatureScreen } from './screens/creature/CreatureScreen';
 import { EncounterBuilderScreen } from './screens/encounter-builder/EncounterBuilderScreen';
 
 const SCREENS = [
@@ -9,7 +11,10 @@ const SCREENS = [
 
 export function App() {
   const hash = useSyncExternalStore(subscribeToHash, () => window.location.hash);
-  const current = SCREENS.find((screen) => screen.hash === hash) ?? SCREENS[0];
+  const slug = creatureSlug(hash);
+  const screen = SCREENS.find((candidate) => candidate.hash === hash) ?? SCREENS[0];
+  // A creature page is no screen in the nav, so no nav link is current on it.
+  const currentHash = slug === null ? screen.hash : null;
 
   return (
     <>
@@ -18,13 +23,13 @@ export function App() {
           <a
             key={screenHash}
             href={screenHash}
-            aria-current={screenHash === current.hash ? 'page' : undefined}
+            aria-current={screenHash === currentHash ? 'page' : undefined}
           >
             {label}
           </a>
         ))}
       </nav>
-      <current.Screen />
+      {slug === null ? <screen.Screen /> : <CreatureScreen slug={slug} />}
     </>
   );
 }

@@ -2,7 +2,7 @@ import { existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import type { Layer } from './run-layers';
 
-export type NetCommand = 'band1' | 'band2' | 'verify';
+export type NetCommand = 'band1' | 'band2' | 'band3' | 'verify';
 
 const VITEST_FAILURE = /^(Tests\s+.*failed|ERROR: Coverage)/;
 const CONTRACT_FAILURE = /^\$\S* -> |^Tests\s+.*failed/;
@@ -10,6 +10,15 @@ const CONTRACT_FAILURE = /^\$\S* -> |^Tests\s+.*failed/;
 const END_TO_END_FAILURE = /^\[chromium\] › |^Error: /;
 // Pact fails provider verification behind an unreachable proxy, even on loopback.
 const PROXY_VARIABLES = ['HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy'];
+// Semgrep ends its run with "Ran 2 rules on 40 files: 1 finding."
+const STATIC_ANALYSIS_FAILURE = /^Ran \d+ rules? on \d+ files?: \d+ findings?/;
+// OSV-Scanner prints this line above its table of advisories.
+const DEPENDENCY_SCANNING_FAILURE = /^Total \d+ packages? affected/;
+
+/** The advisory database OSV-Scanner reads offline. `npm run advisories` downloads it. */
+export function advisoryDatabase(root: string): string {
+  return join(root, '.osv-database');
+}
 
 export function netCommands(root: string): Record<NetCommand, Layer[]> {
   const bin = (tool: string) => join(root, 'node_modules', '.bin', tool);
@@ -86,5 +95,35 @@ export function netCommands(root: string): Record<NetCommand, Layer[]> {
     },
   ];
 
-  return { band1, band2, verify: [...band1, ...band2] };
+  const band3: Layer[] = [
+    {
+      band: 3,
+      name: 'Static analysis',
+      // Only rule files committed to the repo. A registry config such as
+      // `--config auto` fetches rules from semgrep.dev and crashes offline.
+      steps: [
+        [
+          'semgrep',
+          'scan',
+          '--config',
+          'semgrep',
+          '--error',
+          '--disable-version-check',
+          '--metrics=off',
+        ],
+      ],
+      summary: STATIC_ANALYSIS_FAILURE,
+    },
+    {
+      band: 3,
+      name: 'Dependency scanning',
+      // `--offline` reads only the downloaded database and never updates it.
+      // `npm audit` is never used: offline, it passes without checking anything.
+      steps: [['osv-scanner', 'scan', 'source', '--offline', '--lockfile', 'package-lock.json']],
+      summary: DEPENDENCY_SCANNING_FAILURE,
+      env: { OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY: advisoryDatabase(root) },
+    },
+  ];
+
+  return { band1, band2, band3, verify: [...band1, ...band2, ...band3] };
 }

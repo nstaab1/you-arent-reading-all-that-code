@@ -30,7 +30,8 @@ body {
 }
 
 .bestiary,
-.encounter-builder {
+.encounter-builder,
+.creature {
   max-width: 48rem;
   margin: 0 auto;
   padding: 1rem 1rem 2rem;
@@ -59,6 +60,24 @@ body {
   margin: 0;
   color: var(--rule);
   font-variant: small-caps;
+}
+
+.talk-card h3 a {
+  color: inherit;
+}
+
+.creature h1 {
+  margin-bottom: 0;
+  color: var(--rule);
+  font-variant: small-caps;
+}
+
+.lore h2 {
+  border-bottom: 2px solid var(--rule);
+}
+
+.lore p {
+  line-height: 1.6;
 }
 
 .talk-title {

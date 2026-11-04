@@ -1,0 +1,27 @@
+rules:
+  - id: no-shell-command
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: >-
+      exec and execSync hand the whole command string to a shell, so a value
+      built into it can run its own commands. Use execFile or spawn with an
+      argument list.
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern-inside: |
+                  import { ..., $FUNCTION, ... } from '$MODULE';
+                  ...
+              - pattern: $FUNCTION(...)
+          - patterns:
+              - pattern-inside: |
+                  import * as $CHILD_PROCESS from '$MODULE';
+                  ...
+              - pattern: $CHILD_PROCESS.$FUNCTION(...)
+          - pattern: require('$MODULE').$FUNCTION(...)
+      - metavariable-regex:
+          metavariable: $MODULE
+          regex: ^(node:)?child_process$
+      - metavariable-regex:
+          metavariable: $FUNCTION
+          regex: ^exec(Sync)?$
